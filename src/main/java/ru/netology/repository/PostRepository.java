@@ -4,10 +4,13 @@ import ru.netology.exception.NotFoundException;
 import ru.netology.model.Post;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 // Stub
 public class PostRepository {
 
+
+ private AtomicInteger idCounter = new AtomicInteger();
 
   private List<Post> list = new ArrayList<>();
   public List<Post> all() {
@@ -16,7 +19,7 @@ public class PostRepository {
 
   public Optional<Post> getById(long id) {
     try {
-        return Optional.of(list.get((int) id));
+        return Optional.of(list.get((int) id - 1));
     }catch (IndexOutOfBoundsException e){
       return Optional.empty();
     }
@@ -25,9 +28,10 @@ public class PostRepository {
   public Post save(Post post) {
     int id = (int)post.getId();
     if (id == 0){
+      idCounter.getAndIncrement();
       list.add(post);
     }else {
-      if (list.size() - 1 > id){
+      if (idCounter.get() > id){
         list.set(id,post);
       }else{
         throw new NotFoundException();
